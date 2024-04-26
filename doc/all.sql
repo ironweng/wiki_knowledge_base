@@ -19,3 +19,5 @@ CREATE TABLE demo (
                                id INT AUTO_INCREMENT PRIMARY KEY,
                                name varchar(50)
 );
+
+insert into  demo (id, name) values (1,'测试');

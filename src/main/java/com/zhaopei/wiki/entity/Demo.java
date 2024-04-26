@@ -1,6 +1,6 @@
 package com.zhaopei.wiki.entity;
 
-public class demo {
+public class Demo {
     private Integer id;
 
     private String name;
