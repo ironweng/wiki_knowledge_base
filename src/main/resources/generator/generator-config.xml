@@ -40,7 +40,8 @@
                              targetPackage="com.zhaopei.wiki.mapper"
                              type="XMLMAPPER"/>
 
-        <table tableName="demo" domainObjectName="demo"/>
+<!--        <table tableName="demo" domainObjectName="demo"/>-->
+        <table tableName="ebook" domainObjectName="Ebook"/>
         <!--<table tableName="ebook"/>-->
         <!--<table tableName="category"/>-->
         <!--<table tableName="doc"/>-->
