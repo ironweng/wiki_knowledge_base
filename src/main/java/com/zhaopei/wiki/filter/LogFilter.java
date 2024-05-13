@@ -1,4 +1,4 @@
-package com.zhaopei.wiki.filter;// package com.jiawa.wiki.filter;
+package com.zhaopei.wiki.filter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
