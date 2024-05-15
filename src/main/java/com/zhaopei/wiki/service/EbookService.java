@@ -7,6 +7,7 @@ import com.zhaopei.wiki.entity.EbookExample;
 import com.zhaopei.wiki.mapper.EbookMapper;
 import com.zhaopei.wiki.req.EbookReq;
 import com.zhaopei.wiki.resp.EbookResp;
+import com.zhaopei.wiki.resp.PageResp;
 import com.zhaopei.wiki.util.CopyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +22,14 @@ public class EbookService {
     @Autowired
     private EbookMapper ebookMapper;
 
-    public List<EbookResp> list(EbookReq req){
+    public PageResp<EbookResp> list(EbookReq req){
         //以下两句是固定写法
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
         if(!ObjectUtils.isEmpty(req.getName())){
             criteria.andNameLike("%"+req.getName()+"%");
         }
-        PageHelper.startPage(1,3);
+        PageHelper.startPage(req.getPage(),req.getSize());
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
         PageInfo<Ebook> pageInfo=new PageInfo<>(ebookList);
         log.info("总条数:{}",pageInfo.getTotal());
@@ -36,6 +37,9 @@ public class EbookService {
         //(这样做是为了规范,实体类+Req是前端传来的封装查询参数的类,实体类+Resp是后端封装了返回数据的类)
 
         List<EbookResp> respList= CopyUtil.copyList(ebookList,EbookResp.class);
-        return respList;
+        PageResp<EbookResp> pageResp = new PageResp<>();
+        pageResp.setTotal(pageInfo.getTotal());
+        pageResp.setList(respList);
+        return pageResp;
     }
 }
