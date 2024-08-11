@@ -1,17 +1,16 @@
 package com.zhaopei.wiki.mapper;
 
-import com.zhaopei.wiki.entity.Demo;
-import com.zhaopei.wiki.entity.DemoExample;
-import org.apache.ibatis.annotations.Param;
-
+import com.zhaopei.wiki.domain.Demo;
+import com.zhaopei.wiki.domain.DemoExample;
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 public interface DemoMapper {
     long countByExample(DemoExample example);
 
     int deleteByExample(DemoExample example);
 
-    int deleteByPrimaryKey(Integer id);
+    int deleteByPrimaryKey(Long id);
 
     int insert(Demo record);
 
@@ -19,7 +18,7 @@ public interface DemoMapper {
 
     List<Demo> selectByExample(DemoExample example);
 
-    Demo selectByPrimaryKey(Integer id);
+    Demo selectByPrimaryKey(Long id);
 
     int updateByExampleSelective(@Param("record") Demo record, @Param("example") DemoExample example);
 

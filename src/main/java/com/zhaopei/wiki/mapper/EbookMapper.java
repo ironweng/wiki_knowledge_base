@@ -1,7 +1,7 @@
 package com.zhaopei.wiki.mapper;
 
-import com.zhaopei.wiki.entity.Ebook;
-import com.zhaopei.wiki.entity.EbookExample;
+import com.zhaopei.wiki.domain.Ebook;
+import com.zhaopei.wiki.domain.EbookExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 

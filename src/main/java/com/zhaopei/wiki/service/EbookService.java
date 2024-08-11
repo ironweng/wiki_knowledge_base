@@ -2,44 +2,89 @@ package com.zhaopei.wiki.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.zhaopei.wiki.entity.Ebook;
-import com.zhaopei.wiki.entity.EbookExample;
+import com.zhaopei.wiki.domain.Ebook;
+import com.zhaopei.wiki.domain.EbookExample;
 import com.zhaopei.wiki.mapper.EbookMapper;
-import com.zhaopei.wiki.req.EbookReq;
-import com.zhaopei.wiki.resp.EbookResp;
+import com.zhaopei.wiki.req.EbookQueryReq;
+import com.zhaopei.wiki.req.EbookSaveReq;
+import com.zhaopei.wiki.resp.EbookQueryResp;
 import com.zhaopei.wiki.resp.PageResp;
 import com.zhaopei.wiki.util.CopyUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.zhaopei.wiki.util.SnowFlake;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.util.List;
-@Slf4j
+
 @Service
 public class EbookService {
 
-    @Autowired
+    private static final Logger LOG = LoggerFactory.getLogger(EbookService.class);
+
+    @Resource
     private EbookMapper ebookMapper;
 
-    public PageResp<EbookResp> list(EbookReq req){
-        //以下两句是固定写法
+    @Resource
+    private SnowFlake snowFlake;
+
+    public PageResp<EbookQueryResp> list(EbookQueryReq req) {
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
-        if(!ObjectUtils.isEmpty(req.getName())){
-            criteria.andNameLike("%"+req.getName()+"%");
+        if (!ObjectUtils.isEmpty(req.getName())) {
+            criteria.andNameLike("%" + req.getName() + "%");
         }
-        PageHelper.startPage(req.getPage(),req.getSize());
+        if (!ObjectUtils.isEmpty(req.getCategoryId2())) {
+            criteria.andCategory2IdEqualTo(req.getCategoryId2());
+        }
+        PageHelper.startPage(req.getPage(), req.getSize());
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
-        PageInfo<Ebook> pageInfo=new PageInfo<>(ebookList);
-        log.info("总条数:{}",pageInfo.getTotal());
-        //查询出来的ebookList赋给respList返回给前端
-        //(这样做是为了规范,实体类+Req是前端传来的封装查询参数的类,实体类+Resp是后端封装了返回数据的类)
 
-        List<EbookResp> respList= CopyUtil.copyList(ebookList,EbookResp.class);
-        PageResp<EbookResp> pageResp = new PageResp<>();
+        PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
+        LOG.info("总行数：{}", pageInfo.getTotal());
+        LOG.info("总页数：{}", pageInfo.getPages());
+
+        // List<EbookResp> respList = new ArrayList<>();
+        // for (Ebook ebook : ebookList) {
+        //     // EbookResp ebookResp = new EbookResp();
+        //     // BeanUtils.copyProperties(ebook, ebookResp);
+        //     // 对象复制
+        //     EbookResp ebookResp = CopyUtil.copy(ebook, EbookResp.class);
+        //
+        //     respList.add(ebookResp);
+        // }
+
+        // 列表复制
+        List<EbookQueryResp> list = CopyUtil.copyList(ebookList, EbookQueryResp.class);
+
+        PageResp<EbookQueryResp> pageResp = new PageResp();
         pageResp.setTotal(pageInfo.getTotal());
-        pageResp.setList(respList);
+        pageResp.setList(list);
+
         return pageResp;
+    }
+
+    /**
+     * 保存
+     */
+    public void save(EbookSaveReq req) {
+        Ebook ebook = CopyUtil.copy(req, Ebook.class);
+        if (ObjectUtils.isEmpty(req.getId())) {
+            // 新增
+            ebook.setId(snowFlake.nextId());
+            ebook.setDocCount(0);
+            ebook.setViewCount(0);
+            ebook.setVoteCount(0);
+            ebookMapper.insert(ebook);
+        } else {
+            // 更新
+            ebookMapper.updateByPrimaryKey(ebook);
+        }
+    }
+
+    public void delete(Long id) {
+        ebookMapper.deleteByPrimaryKey(id);
     }
 }
